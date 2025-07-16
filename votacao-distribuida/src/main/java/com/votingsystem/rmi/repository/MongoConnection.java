@@ -3,16 +3,18 @@ package com.votingsystem.rmi.repository;
 import com.mongodb.ConnectionString;
 import com.mongodb.MongoClientSettings;
 import com.mongodb.client.*;
-import jdk.jpackage.internal.Log;
 
 import java.util.HashSet;
 import java.util.Set;
+import java.util.logging.Logger;
 
 public class MongoConnection {
     private MongoClient mongoClient;
     private MongoDatabase mongoDatabase;
+    private Logger log;
 
     public MongoConnection() {
+        log = Logger.getLogger("global");
         ConnectionString connectionString = new ConnectionString("mongodb://bancodeDatabase:askjKLSDJFBN342523ASKJDFNasasfkjnadsfkjadfb34634@mongodb:27017?authSource=admin");
         MongoClientSettings settings = MongoClientSettings.builder()
                 .applyConnectionString(connectionString)
@@ -21,7 +23,7 @@ public class MongoConnection {
         mongoClient = MongoClients.create(settings);
 
         mongoDatabase = mongoClient.getDatabase("voting-system");
-        Log.info("Conectado ao MongoDB!");
+        log.info("Conectado ao MongoDB!");
 
         ensureCollectionExists("users");
         ensureCollectionExists("polls");
@@ -46,11 +48,11 @@ public class MongoConnection {
         }
 
         if (!existingCollections.contains(collectionName)) {
-            Log.info("Coleção '" + collectionName + "' não encontrada. Criando...");
+            log.info("Coleção '" + collectionName + "' não encontrada. Criando...");
             try {
                 // Tenta criar a coleção
                 this.mongoDatabase.createCollection(collectionName);
-                Log.info("Coleção '" + collectionName + "' criada com sucesso.");
+                log.info("Coleção '" + collectionName + "' criada com sucesso.");
             } catch (Exception e) {
                 System.err.println("Erro ao criar a coleção '" + collectionName + "': " + e.getMessage());
             }

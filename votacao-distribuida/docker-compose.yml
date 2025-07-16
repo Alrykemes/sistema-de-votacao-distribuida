@@ -1,32 +1,42 @@
 services:
-  voting-server:
-    build: .
-    container_name: voting-server
-    # CLASSPATH CORRIGIDO: Inclui target/classes e target/lib/*
-    command: ["java", "-cp", "target/classes:target/lib/*", "com.votingsystem.rmi.server.VotingServerMain"]
+  central:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      args:
+        MAIN_CLASS: com.votingsystem.rmi.central.CentralServerMain
+    container_name: central-server
+    ports:
+      - "1099:1099" # Porta padrão RMI
     networks:
       - votenet
 
-  central-server:
-    build: .
-    container_name: central-server
+  server:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      args:
+        MAIN_CLASS: com.votingsystem.rmi.server.VotingServerMain
+    container_name: voting-server
     depends_on:
-      - voting-server
-      - mongodb
-    # CLASSPATH CORRIGIDO: Inclui target/classes e target/lib/*
-    command: ["java", "-cp", "target/classes:target/lib/*", "com.votingsystem.rmi.central.CentralServerMain"]
+      - central
     networks:
       - votenet
 
   client:
-    build: .
-    container_name: client
+    build:
+      context: .
+      dockerfile: Dockerfile
+      args:
+        MAIN_CLASS: com.votingsystem.rmi.client.VotingClient
+    container_name: voting-client
     depends_on:
-      - central-server
-    # CLASSPATH CORRIGIDO: Inclui target/classes e target/lib/*
-    command: ["java", "-cp", "target/classes:target/lib/*", "com.votingsystem.rmi.client.VotingClient"]
+      - central
+      - server
     networks:
       - votenet
+    stdin_open: true
+    tty: true
 
   mongodb:
     image: mongo:7.0
