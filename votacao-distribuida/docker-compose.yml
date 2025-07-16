@@ -1,0 +1,51 @@
+services:
+  voting-server:
+    build: .
+    container_name: voting-server
+    # CLASSPATH CORRIGIDO: Inclui target/classes e target/lib/*
+    command: ["java", "-cp", "target/classes:target/lib/*", "com.votingsystem.rmi.server.VotingServerMain"]
+    networks:
+      - votenet
+
+  central-server:
+    build: .
+    container_name: central-server
+    depends_on:
+      - voting-server
+      - mongodb
+    # CLASSPATH CORRIGIDO: Inclui target/classes e target/lib/*
+    command: ["java", "-cp", "target/classes:target/lib/*", "com.votingsystem.rmi.central.CentralServerMain"]
+    networks:
+      - votenet
+
+  client:
+    build: .
+    container_name: client
+    depends_on:
+      - central-server
+    # CLASSPATH CORRIGIDO: Inclui target/classes e target/lib/*
+    command: ["java", "-cp", "target/classes:target/lib/*", "com.votingsystem.rmi.client.VotingClient"]
+    networks:
+      - votenet
+
+  mongodb:
+    image: mongo:7.0
+    container_name: mongodb
+    restart: unless-stopped
+    ports:
+      - "27017:27017"
+    environment:
+      MONGO_INITDB_DATABASE: voting-system
+      MONGO_INITDB_ROOT_USERNAME: bancodeDatabase
+      MONGO_INITDB_ROOT_PASSWORD: askjKLSDJFBN342523ASKJDFNasasfkjnadsfkjadfb34634
+    volumes:
+      - mongodb_data:/data/db
+    networks:
+      - votenet
+
+networks:
+  votenet:
+    driver: bridge
+
+volumes:
+  mongodb_data:

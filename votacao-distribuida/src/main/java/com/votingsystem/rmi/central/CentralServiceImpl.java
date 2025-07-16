@@ -1,7 +1,11 @@
 package com.votingsystem.rmi.central;
 
+import com.votingsystem.rmi.domain.User;
+import com.votingsystem.rmi.exception.UserAlreadyExistsException;
 import com.votingsystem.rmi.interfaces.CentralService;
 import com.votingsystem.rmi.interfaces.VotingService;
+import com.votingsystem.rmi.repository.UserRepository;
+import com.votingsystem.rmi.security.PasswordEncoder;
 
 import java.rmi.server.UnicastRemoteObject;
 import java.rmi.RemoteException;
@@ -11,9 +15,13 @@ import java.util.List;
 
 public class CentralServiceImpl extends UnicastRemoteObject implements CentralService {
     private List<VotingService> votingServers;
+    private UserRepository userRepository;
+    private PasswordEncoder passwordEncoder;
 
     protected CentralServiceImpl(List<VotingService> servers) throws RemoteException {
         this.votingServers = servers;
+        this.userRepository = new UserRepository();
+        this.passwordEncoder = new PasswordEncoder();
     }
 
     @Override
@@ -28,5 +36,26 @@ public class CentralServiceImpl extends UnicastRemoteObject implements CentralSe
             // Repetir para outras enquetes / servidores
         }
         return aggregated;
+    }
+
+    @Override
+    public User registerUser(User user) throws RemoteException, UserAlreadyExistsException {
+        if (userRepository.findByUsername(user.getUsername()) == null) {
+            user.setPassword(passwordEncoder.hashPassword(user.getPassword()));
+            userRepository.save(user);
+            return user;
+        } else {
+            throw new UserAlreadyExistsException(user.getUsername());
+        }
+    }
+
+    @Override
+    public boolean loginUser(String username, String password) throws RemoteException {
+        User user = userRepository.findByUsername(username);
+        if (user != null && passwordEncoder.verifyPassword(password, user.getPassword())) {
+            return true;
+        } else {
+            return false;
+        }
     }
 }

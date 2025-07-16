@@ -1,12 +1,14 @@
 package com.votingsystem.rmi.server;
 
 import com.votingsystem.rmi.interfaces.VotingService;
-
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
+import java.util.logging.Logger;
 
 public class VotingServerMain {
     public static void main(String[] args) {
+        Logger log = Logger.getLogger("global");
+
         try {
             // Define hostname para evitar problemas de binding no container
             System.setProperty("java.rmi.server.hostname", "voting-server");
@@ -19,7 +21,7 @@ public class VotingServerMain {
             // Registra o serviço
             registry.rebind("VotingService1", votingService);
 
-            System.out.println("Servidor de votação ativo como 'VotingService1' na porta 1099.");
+            log.info("Servidor de votação ativo como 'VotingService1' na porta 1099.");
         } catch (Exception e) {
             e.printStackTrace();
         }
