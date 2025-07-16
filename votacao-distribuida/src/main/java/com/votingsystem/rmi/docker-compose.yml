@@ -1,0 +1,29 @@
+services:
+  voting-server:
+    build: .
+    container_name: voting-server
+    command: ["java", "-cp", ".", "com.votingsystem.rmi.server.VotingServerMain"]
+    networks:
+      - votenet
+
+  central-server:
+    build: .
+    container_name: central-server
+    depends_on:
+      - voting-server
+    command: ["java", "-cp", ".", "com.votingsystem.rmi.central.CentralServerMain"]
+    networks:
+      - votenet
+
+  client:
+    build: .
+    container_name: client
+    depends_on:
+      - central-server
+    command: ["java", "-cp", ".", "com.votingsystem.rmi.client.VotingClient"]
+    networks:
+      - votenet
+
+networks:
+  votenet:
+    driver: bridge
