@@ -97,26 +97,6 @@ public class VotingClient {
                 option = sc.nextInt();
             } while (option != 1 && option != 2);
 
-
-//            // Vota em algumas opções
-//            votingService.vote("poll1", "opcaoA");
-//            votingService.vote("poll1", "opcaoB");
-//            votingService.vote("poll1", "opcaoA");
-//
-//            System.out.println("Votos registrados!");
-//
-//            Map<String, Integer> parcial = votingService.getVotes("poll1");
-//            System.out.println("Resultado parcial da poll1:");
-//            parcial.forEach((op, count) -> System.out.println(op + ": " + count));
-//
-//            Map<String, Map<String, Integer>> total = centralService.aggregateResults();
-//
-//            System.out.println("Resultado agregado do servidor central:");
-//            total.forEach((poll, options) -> {
-//                System.out.println("Enquete: " + poll);
-//                options.forEach((op, count) -> System.out.println("  " + op + ": " + count));
-//            });
-
         } catch (Exception e) {
             e.printStackTrace();
         }
