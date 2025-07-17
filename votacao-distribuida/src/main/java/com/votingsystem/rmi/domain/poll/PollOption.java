@@ -10,6 +10,7 @@ import lombok.Setter;
 public class PollOption {
     private static final long serialVersionUID = 1L;
 
+    private String id;
     private String text;
     private int votes;
 }

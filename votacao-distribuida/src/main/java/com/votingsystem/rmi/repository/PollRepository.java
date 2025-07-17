@@ -14,21 +14,26 @@ public class PollRepository implements PollRepositoryInterface {
 
     @Override
     public void save(Poll poll) {
+        if (poll == null) throw new IllegalArgumentException("Poll não pode ser nulo");
 
+        pollCollection.replaceOne(
+                Filters.eq("id", poll.getId()),
+                poll,
+                new ReplaceOptions().upsert(true)
+        );
     }
 
     @Override
-    public Poll findAll() {
-        return null;
+    public List<Poll> findAll() {
+        List<Poll> polls = new ArrayList<>();
+        pollCollection.find().into(polls);
+        return polls;
+    }
+
+    public Poll findByTitle(String title) {
+        return pollCollection.find(Filters.eq("title", title)).first();
     }
 
     @Override
-    public void delete(String id) {
-
-    }
-
-    @Override
-    public void vote(String id, String optionId) {
-
-    }
+    public void vote(String id, String optionId) {}
 }

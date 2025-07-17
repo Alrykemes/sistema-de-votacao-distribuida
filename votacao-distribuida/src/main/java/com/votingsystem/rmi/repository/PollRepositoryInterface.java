@@ -5,7 +5,7 @@ import com.votingsystem.rmi.domain.user.User;
 
 public interface PollRepositoryInterface {
     public void save(Poll poll);
-    public Poll findAll();
-    public void delete(String id);
+    public Poll findByTitle(String title)
+    public List<Poll> findAll();
     public void vote(String id, String optionId);
 }

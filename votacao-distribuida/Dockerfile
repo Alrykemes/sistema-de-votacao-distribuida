@@ -7,6 +7,7 @@ COPY .mvn ./.mvn
 COPY pom.xml ./
 COPY src ./src
 
+RUN apt-get update && apt-get install -y dos2unix && dos2unix mvnw
 RUN chmod +x mvnw && ./mvnw clean package -DskipTests
 
 # Final image
