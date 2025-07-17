@@ -5,7 +5,6 @@ import lombok.Getter;
 
 import java.rmi.server.UnicastRemoteObject;
 import java.rmi.RemoteException;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -13,13 +12,10 @@ import java.util.Map;
 public class VotingServiceImpl extends UnicastRemoteObject implements VotingService {
     private Map<String, Map<String, Integer>> pollVotes;
     private Map<String, Map<String, String>> userVotes;
-    private final Map<String, List<String>> pollOptions;
-
 
     protected VotingServiceImpl() throws RemoteException {
         pollVotes = new HashMap<>();
         userVotes = new HashMap<>();
-        pollOptions = new HashMap<>();
     }
 
     @Override
@@ -29,11 +25,6 @@ public class VotingServiceImpl extends UnicastRemoteObject implements VotingServ
         if (userVotes.get(userId).containsKey(pollId)) {
             System.out.println("User " + userId + " has already voted in poll " + pollId);
             return;
-        }
-
-        List<String> validOptions = pollOptions.get(pollId);
-        if (validOptions == null || !validOptions.contains(option)) {
-            throw new RemoteException("Opção inválida para a enquete: " + option);
         }
 
         // Register user vote
@@ -51,10 +42,4 @@ public class VotingServiceImpl extends UnicastRemoteObject implements VotingServ
     public Map<String, Integer> getVotes(String pollId) throws RemoteException {
         return pollVotes.getOrDefault(pollId, new HashMap<>());
     }
-
-    @Override
-    public List<String> getOptions(String pollId) throws RemoteException {
-        return pollOptions.getOrDefault(pollId, new ArrayList<>());
-    }
-
 }

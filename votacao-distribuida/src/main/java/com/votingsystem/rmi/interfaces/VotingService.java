@@ -8,5 +8,4 @@ import java.util.Map;
 public interface VotingService extends Remote {
     void vote(String username, String pollId, String option) throws RemoteException;
     Map<String, Integer> getVotes(String pollId) throws RemoteException;
-    List<String> getOptions(String pollId) throws RemoteException;
 }

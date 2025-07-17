@@ -21,7 +21,6 @@ public class VotingHandler {
         this.username = scanner.nextLine();
     }
 
-
     public void showMainMenu() {
         while (true) {
             System.out.println("\nMain Menu:\n");
@@ -81,62 +80,60 @@ public class VotingHandler {
             }
 
             centralService.createPoll(title, options);
-            System.out.println("Enquete criada com sucesso.!");
-
+            System.out.println("Enquete criada com sucesso!");
         } catch (RemoteException e) {
             System.out.println("Erro criando enquete: " + e.getMessage());
         }
     }
 
-    public void vote() throws RemoteException {
-        List<String> polls = votingService.getPolls();
+    private void vote() {
+        try {
+            Map<String, Map<String, Integer>> polls = centralService.listPolls();
+            if (polls.isEmpty()) {
+                System.out.println("Nenhuma enquete disponível para votar.");
+                return;
+            }
 
-        if (polls.isEmpty()) {
-            System.out.println("Não há enquetes disponíveis.");
-            return;
+            System.out.println("Escolha uma enquete para votar:");
+            List<String> pollTitles = new ArrayList<>(polls.keySet());
+            for (int i = 0; i < pollTitles.size(); i++) {
+                System.out.println((i + 1) + " - " + pollTitles.get(i));
+            }
+
+            int pollChoice = scanner.nextInt();
+            scanner.nextLine(); // clear buffer
+
+            if (pollChoice < 1 || pollChoice > pollTitles.size()) {
+                System.out.println("Escolha inválida.");
+                return;
+            }
+
+            String selectedPoll = pollTitles.get(pollChoice - 1);
+            Map<String, Integer> options = polls.get(selectedPoll);
+
+            System.out.println("Opções para a enquete '" + selectedPoll + "':");
+            List<String> optionList = new ArrayList<>(options.keySet());
+            for (int i = 0; i < optionList.size(); i++) {
+                System.out.println((i + 1) + " - " + optionList.get(i));
+            }
+
+            int optionChoice = scanner.nextInt();
+            scanner.nextLine(); // clear buffer
+
+            if (optionChoice < 1 || optionChoice > optionList.size()) {
+                System.out.println("Opção inválida.");
+                return;
+            }
+
+            String selectedOption = optionList.get(optionChoice - 1);
+
+            // Chamada correta ao método vote
+            votingService.vote(username, selectedPoll, selectedOption);
+
+            System.out.println("Voto registrado com sucesso!");
+
+        } catch (RemoteException e) {
+            System.out.println("Erro ao votar: " + e.getMessage());
         }
-
-        System.out.println("Enquetes disponíveis:");
-        for (int i = 0; i < polls.size(); i++) {
-            System.out.println((i + 1) + ". " + polls.get(i));
-        }
-
-        System.out.print("Escolha o número da enquete: ");
-        int pollIndex = scanner.nextInt();
-        scanner.nextLine(); // Limpa o \n deixado pelo nextInt()
-
-        if (pollIndex < 1 || pollIndex > polls.size()) {
-            System.out.println("Número de enquete inválido.");
-            return;
-        }
-
-        String selectedPoll = polls.get(pollIndex - 1);
-
-        List<String> options = votingService.getOptions(selectedPoll);
-
-        if (options.isEmpty()) {
-            System.out.println("Essa enquete não possui opções.");
-            return;
-        }
-
-        System.out.println("Opções disponíveis:");
-        for (int i = 0; i < options.size(); i++) {
-            System.out.println((i + 1) + ". " + options.get(i));
-        }
-
-        System.out.print("Escolha o número da opção: ");
-        int optionIndex = scanner.nextInt();
-        scanner.nextLine(); // Limpa o \n
-
-        if (optionIndex < 1 || optionIndex > options.size()) {
-            System.out.println("Número de opção inválido.");
-            return;
-        }
-
-        String selectedOption = options.get(optionIndex - 1);
-
-        votingService.vote(username, selectedPoll, selectedOption);
-
-        System.out.println("Voto registrado com sucesso!");
     }
 }
