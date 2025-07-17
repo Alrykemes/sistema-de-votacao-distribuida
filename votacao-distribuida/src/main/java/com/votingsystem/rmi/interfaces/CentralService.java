@@ -1,6 +1,6 @@
 package com.votingsystem.rmi.interfaces;
 
-import com.votingsystem.rmi.domain.User;
+import com.votingsystem.rmi.domain.user.User;
 
 import java.rmi.Remote;
 import java.rmi.RemoteException;

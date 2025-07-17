@@ -1,12 +1,14 @@
 package com.votingsystem.rmi.repository;
 
+import com.mongodb.client.FindIterable;
 import com.mongodb.client.MongoCollection;
-import com.votingsystem.rmi.domain.User;
+import com.votingsystem.rmi.domain.user.User;
+import com.votingsystem.rmi.domain.user.UserDto;
 import org.bson.Document;
 
 public class UserRepository implements UserRepositoryInterface {
     private MongoConnection mongoConnection;
-    private MongoCollection userCollection;
+    private MongoCollection<Document> userCollection;
 
     public UserRepository() {
         this.mongoConnection = new MongoConnection();
@@ -15,11 +17,17 @@ public class UserRepository implements UserRepositoryInterface {
 
     @Override
     public void save(User user) {
-        this.userCollection.insertOne(user);
+        Document doc = new Document("username", user.getUsername())
+                .append("password", user.getPassword());
+        this.userCollection.insertOne(doc);
     }
 
     @Override
-    public User findByUsername(String username) {
-        return (User) userCollection.find(new Document("username", username)).first();
+    public UserDto findByUsername(String username) {
+        Document doc = userCollection.find(new Document("username", username)).first();
+
+        if (doc == null) return null;
+
+        return new UserDto(doc.getString("id"), doc.getString("username"), doc.getString("password"));
     }
 }

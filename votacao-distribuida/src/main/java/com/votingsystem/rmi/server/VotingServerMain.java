@@ -11,7 +11,7 @@ public class VotingServerMain {
 
         try {
             // Define hostname para evitar problemas de binding no container
-            System.setProperty("java.rmi.server.hostname", "voting-server");
+            System.setProperty("java.rmi.server.hostname", "voting-server-1");
 
             // Cria o registry no próprio processo na porta 1099
             Registry registry = LocateRegistry.createRegistry(1099);

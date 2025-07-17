@@ -1,7 +1,7 @@
 package com.votingsystem.rmi.client;
 
 
-import com.votingsystem.rmi.domain.User;
+import com.votingsystem.rmi.domain.user.User;
 import com.votingsystem.rmi.exception.UserAlreadyExistsException;
 import com.votingsystem.rmi.interfaces.VotingService;
 import com.votingsystem.rmi.interfaces.CentralService;
@@ -22,7 +22,7 @@ public class VotingClient {
 
         try {
             // Conecta ao registry do VotingServer para pegar VotingService
-            Registry votingRegistry = LocateRegistry.getRegistry("voting-server", 1099);
+            Registry votingRegistry = LocateRegistry.getRegistry("voting-server-1", 1099);
             // Conecta ao servidor central para pegar o CentralService
             Registry centralRegistry = LocateRegistry.getRegistry("central-server", 1099);
 
@@ -60,13 +60,18 @@ public class VotingClient {
                         System.out.println("Digite sua senha: ");
                         String passwordL = sc.next();
                         try {
-                            centralService.loginUser(usernameL, passwordL);
-                        } catch (UserAlreadyExistsException exceptionRegister) {
+                            if(centralService.loginUser(usernameL, passwordL)) {
+                                System.out.println("Login realizado com sucesso!");
+                                break;
+                            } else {
+                                System.out.println("Credenciais invalidas! Tente novamente!");
+                                continue;
+                            }
+                        } catch (Exception exceptionRegister) {
                             option = 9999999;
                             System.out.println(exceptionRegister.getMessage());
+                            continue;
                         }
-                        System.out.println("Login realizado com sucesso!");
-                        break;
                     case 2:
                         System.out.println("Digite seu usuario: ");
                         String usernameR = sc.next();

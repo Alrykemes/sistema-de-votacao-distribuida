@@ -19,7 +19,7 @@ public class CentralServerMain {
             Registry registry = LocateRegistry.createRegistry(1099);
 
             // Tenta conectar ao VotingService1 no servidor VotingServer
-            Registry votingRegistry = LocateRegistry.getRegistry("voting-server", 1099);
+            Registry votingRegistry = LocateRegistry.getRegistry("voting-server-1", 1099);
 
             while (votingService == null) {
                 try {

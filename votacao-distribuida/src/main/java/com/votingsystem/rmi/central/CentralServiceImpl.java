@@ -1,6 +1,7 @@
 package com.votingsystem.rmi.central;
 
-import com.votingsystem.rmi.domain.User;
+import com.votingsystem.rmi.domain.user.User;
+import com.votingsystem.rmi.domain.user.UserDto;
 import com.votingsystem.rmi.exception.UserAlreadyExistsException;
 import com.votingsystem.rmi.interfaces.CentralService;
 import com.votingsystem.rmi.interfaces.VotingService;
@@ -12,16 +13,19 @@ import java.rmi.RemoteException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.List;
+import java.util.logging.Logger;
 
 public class CentralServiceImpl extends UnicastRemoteObject implements CentralService {
     private List<VotingService> votingServers;
     private UserRepository userRepository;
     private PasswordEncoder passwordEncoder;
+    private Logger log;
 
     protected CentralServiceImpl(List<VotingService> servers) throws RemoteException {
         this.votingServers = servers;
         this.userRepository = new UserRepository();
         this.passwordEncoder = new PasswordEncoder();
+        this.log = Logger.getLogger("global");
     }
 
     @Override
@@ -51,11 +55,11 @@ public class CentralServiceImpl extends UnicastRemoteObject implements CentralSe
 
     @Override
     public boolean loginUser(String username, String password) throws RemoteException {
-        User user = userRepository.findByUsername(username);
-        if (user != null && passwordEncoder.verifyPassword(password, user.getPassword())) {
-            return true;
-        } else {
-            return false;
+        UserDto user = userRepository.findByUsername(username);
+        if (user != null && user.password() != null) {
+            return passwordEncoder.verifyPassword(password, user.password());
         }
+
+        return false;
     }
 }

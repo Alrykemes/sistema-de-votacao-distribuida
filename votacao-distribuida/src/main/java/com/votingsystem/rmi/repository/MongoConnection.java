@@ -15,7 +15,7 @@ public class MongoConnection {
 
     public MongoConnection() {
         log = Logger.getLogger("global");
-        ConnectionString connectionString = new ConnectionString("mongodb://bancodeDatabase:askjKLSDJFBN342523ASKJDFNasasfkjnadsfkjadfb34634@mongodb:27017?authSource=admin");
+        ConnectionString connectionString = new ConnectionString("mongodb://bancodeDatabase:askjKLSDJFBN342523ASKJDFNasasfkjnadsfkjadfb34634@mongodb:27017");
         MongoClientSettings settings = MongoClientSettings.builder()
                 .applyConnectionString(connectionString)
                 .build();
