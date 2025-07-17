@@ -1,4 +1,4 @@
-package com.votingsystem.client.client;
+package com.votingsystem.client;
 
 import com.votingsystem.common.domain.User;
 import com.votingsystem.common.exception.UserAlreadyExistsException;

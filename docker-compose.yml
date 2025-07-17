@@ -21,7 +21,6 @@ services:
       - "1099:1099"
     environment:
       RMI_HOSTNAME: voting-server
-      # Outras variáveis se precisar
     networks:
       - votingnet
 
