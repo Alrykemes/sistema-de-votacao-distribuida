@@ -1,0 +1,60 @@
+services:
+  mongodb:
+    image: mongo:6.0
+    container_name: mongodb
+    restart: unless-stopped
+    ports:
+      - "27017:27017"
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: votingsystem
+      MONGO_INITDB_ROOT_PASSWORD: askjKLSDJFBN342523ASKJDFNasasfkjnadsfkjadfb34634
+    volumes:
+      - mongo_data:/data/db
+
+  voting-server:
+    build:
+      context: ./voting-server
+    container_name: voting-server
+    depends_on:
+      - mongodb
+    ports:
+      - "1099:1099"
+    environment:
+      RMI_HOSTNAME: voting-server
+      # Outras variáveis se precisar
+    networks:
+      - votingnet
+
+  central-server:
+    build:
+      context: ./central-server
+    container_name: central-server
+    depends_on:
+      - mongodb
+      - voting-server
+    ports:
+      - "1099:1099"
+    environment:
+      RMI_HOSTNAME: central-server
+      MONGODB_URI: mongodb://votingsystem:askjKLSDJFBN342523ASKJDFNasasfkjnadsfkjadfb34634@mongodb:27017/?authSource=admin
+    networks:
+      - votingnet
+
+  client:
+    build:
+      context: ./client
+    container_name: voting-client
+    depends_on:
+      - voting-server
+      - central-server
+    networks:
+      - votingnet
+    stdin_open: true
+    tty: true
+
+volumes:
+  mongo_data:
+
+networks:
+  votingnet:
+    driver: bridge
