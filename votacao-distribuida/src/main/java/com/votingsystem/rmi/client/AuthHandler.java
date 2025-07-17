@@ -1,3 +1,11 @@
+package com.votingsystem.rmi.client;
+
+import com.votingsystem.rmi.domain.user.User;
+import com.votingsystem.rmi.exception.UserAlreadyExistsException;
+import com.votingsystem.rmi.interfaces.CentralService;
+
+import java.util.Scanner;
+
 public class AuthHandler {
     private final CentralService centralService;
     private final Scanner sc;
@@ -48,7 +56,7 @@ public class AuthHandler {
             System.out.println("Cadastro realizado com sucesso!");
         } catch (UserAlreadyExistsException e) {
             System.out.println("Erro: " + e.getMessage());
-            register(); // tenta de novo
+            register();
         } catch (Exception e) {
             System.out.println("Erro: " + e.getMessage());
         }

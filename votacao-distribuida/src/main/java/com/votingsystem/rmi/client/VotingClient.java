@@ -26,11 +26,12 @@ public class VotingClient {
             AuthHandler authHandler = new AuthHandler(centralService, sc);
             authHandler.handleAuth();
 
-            VotingHandler votingHandler = new VotingHandler(centralService, sc);
-            votingHandler.showResults();
+            VotingHandler votingHandler = new VotingHandler(centralService, votingService ,sc);
+            votingHandler.showMainMenu();
 
         } catch (Exception e) {
             e.printStackTrace();
         }
     }
 }
+

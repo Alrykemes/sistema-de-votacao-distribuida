@@ -1,5 +1,7 @@
 package com.votingsystem.rmi.central;
 
+import com.votingsystem.rmi.domain.poll.Poll;
+import com.votingsystem.rmi.domain.poll.PollOption;
 import com.votingsystem.rmi.domain.user.User;
 import com.votingsystem.rmi.domain.user.UserDto;
 import com.votingsystem.rmi.exception.UserAlreadyExistsException;
@@ -11,9 +13,7 @@ import com.votingsystem.rmi.security.PasswordEncoder;
 
 import java.rmi.server.UnicastRemoteObject;
 import java.rmi.RemoteException;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.List;
+import java.util.*;
 import java.util.logging.Logger;
 
 public class CentralServiceImpl extends UnicastRemoteObject implements CentralService {
@@ -26,6 +26,7 @@ public class CentralServiceImpl extends UnicastRemoteObject implements CentralSe
     protected CentralServiceImpl(List<VotingService> servers) throws RemoteException {
         this.votingServers = servers;
         this.userRepository = new UserRepository();
+        this.pollRepository = new PollRepository();
         this.passwordEncoder = new PasswordEncoder();
         this.log = Logger.getLogger("global");
     }
@@ -66,23 +67,38 @@ public class CentralServiceImpl extends UnicastRemoteObject implements CentralSe
 
     @Override
     public synchronized void createPoll(String title, List<String> options) throws RemoteException {
-        if (polls.containsKey(title)) {
+        Poll existingPoll = pollRepository.findByTitle(title);
+        if (existingPoll != null) {
             throw new RemoteException("Já existe uma enquete com esse título.");
         }
-        Map<String, Integer> optionVotes = new HashMap<>();
+
+        // Cria lista de opções
+        List<PollOption> pollOptions = new ArrayList<>();
         for (String option : options) {
-            optionVotes.put(option, 0);
+            String optionId = UUID.randomUUID().toString(); // ID único para cada opção
+            pollOptions.add(new PollOption(optionId, option, 0));
         }
-        polls.put(title, optionVotes);
+
+        // Cria nova enquete
+        Poll newPoll = new Poll(UUID.randomUUID().toString(), title, pollOptions);
+
+        // Salva no banco
+        pollRepository.save(newPoll);
     }
 
     @Override
-    public Map<String, List<String>> listPolls() throws RemoteException {
-        Map<String, List<String>> result = new HashMap<>();
-        for (var entry : polls.entrySet()) {
-            result.put(entry.getKey(), new ArrayList<>(entry.getValue().keySet()));
+    public Map<String, Map<String, Integer>> listPolls() throws RemoteException {
+        List<Poll> polls = pollRepository.findAll();
+        Map<String, Map<String, Integer>> result = new HashMap<>();
+
+        for (Poll poll : polls) {
+            Map<String, Integer> options = new LinkedHashMap<>();
+            for (PollOption option : poll.getPollOptionsList()) {
+                options.put(option.getText(), option.getVotes());
+            }
+            result.put(poll.getTitle(), options);
         }
+
         return result;
     }
-
 }
